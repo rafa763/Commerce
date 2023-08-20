@@ -62,7 +62,9 @@ def create(request):
 
 
 def listing(request, id):
-    return render(request, "auctions/listing.html")
+    return render(request, "auctions/listing.html", {
+        "listing": Listings.objects.get(pk=id)
+    })
 
 
 def watchlist(request):
