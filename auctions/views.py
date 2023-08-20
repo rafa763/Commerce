@@ -33,19 +33,25 @@ def create(request):
     if request.method == "POST":
         title = request.POST["title"]
         description = request.POST["description"]
-        price = request.POST["price"]
+        price = request.POST["starting_bid"]
         category = request.POST["category"]
-        image = request.POST["image"]
+        image = request.POST["image_url"]
 
+        print(f"{category}")
         # create listing
-        listing = Listings(title=title, description=description, price=price, category=category, image=image)
+        catg = Categories.objects.get(pk=category)
+        listing = Listings(title=title, description=description, price=price, category=catg, created_by=User.objects.get(pk=request.user.id), image=image)
         listing.save()
 
         return HttpResponseRedirect(reverse("index"))
-    return render(request, "auctions/create.html")
+    
+    categories = Categories.objects.all()
+    return render(request, "auctions/create.html", {
+        "categories": categories
+    })
 
 
-def listing(request, listing_id):
+def listing(request, id):
     return render(request, "auctions/listing.html")
 
 

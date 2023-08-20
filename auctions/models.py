@@ -10,6 +10,9 @@ class User(AbstractUser):
 class Categories(models.Model):
     name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return f"{self.id}: {self.name}"
+
 
 # auction listings
 class Listings(models.Model):
@@ -21,6 +24,10 @@ class Listings(models.Model):
     active = models.BooleanField(default=True) 
     category = models.ForeignKey(Categories, on_delete=models.CASCADE, related_name="category")
     image = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.title}: \
+        description: {self.description}, price: {self.price}, at: {self.created_at}, by: {self.created_by}, cat: {self.category}, img: {self.image}"
 
 # bids
 class Bids(models.Model):
