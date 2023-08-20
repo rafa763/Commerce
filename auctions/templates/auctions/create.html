@@ -3,5 +3,33 @@
 {% block body %}
     <h2>create listing</h2>
 
-    TODO
+    <form action="{% url 'create' %}" method="post">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input class="form-control" type="text" name="title">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" name="description"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="starting_bid">Starting Bid</label>
+            <input class="form-control" type="number" name="starting_bid">
+        </div>
+        <div class="form-group">
+            <label for="image_url">Image URL</label>
+            <input class="form-control" type="url" name="image_url">
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select class="form-control" name="category">
+                <option value="">Select a category</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Create</button>
+    </form>
 {% endblock %}

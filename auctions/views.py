@@ -4,22 +4,44 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Listings, Bids, Comments, Categories, Watchlist
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    # all listings that are active
+    listings = Listings.objects.filter(active=True)
+    return render(request, "auctions/index.html", {
+        "listings": listings
+    })
 
 
 def categories(request):
-    return render(request, "auctions/categories.html")
+    categs = Categories.objects.all()
+    return render(request, "auctions/categories.html", {
+        "categories": categs
+    })
 
 
 def category(request, category):
-    return render(request, "auctions/category.html")
+    listings = Listings.objects.filter(category=category)
+    return render(request, "auctions/category.html", {
+        "listings": listings
+    })
 
 
 def create(request):
+    if request.method == "POST":
+        title = request.POST["title"]
+        description = request.POST["description"]
+        price = request.POST["price"]
+        category = request.POST["category"]
+        image = request.POST["image"]
+
+        # create listing
+        listing = Listings(title=title, description=description, price=price, category=category, image=image)
+        listing.save()
+
+        return HttpResponseRedirect(reverse("index"))
     return render(request, "auctions/create.html")
 
 
