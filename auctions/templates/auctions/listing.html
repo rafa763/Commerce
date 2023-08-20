@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Listing: {{ listing.title }}</h2>
+
+    
+    <div class="col-md-3 px0">
+        <img class="img-fluid card-img-top" src="{{ listing.image }}" alt="image">
+    </div>
+    <div class="card-body ml-4">
+        <h1 class="card-title p-8">{{ listing.title }}</h1>
+        <h5><strong>price:</strong> ${{ listing.price }}</h5>
+    </div>
+
+    <form action="{% url 'create' %}" method="post">
+        <div class="form-group">
+            <label for="bid">Bid</label>
+            <input class="form-control" type="number" name="bid">
+        </div>
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Place Bid</button>
+    </form> 
+   
+    <h5 class="mt-5"><strong>Details</strong></h5>
+    <ul>
+        <li>Listed by: <a href="#">name</a></li>
+        <li>Category: Electronics</li>
+    </ul>
+{% endblock %}
