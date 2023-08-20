@@ -22,9 +22,19 @@ def categories(request):
     })
 
 
+def category_new(request):
+    if request.method == "POST":
+        name = request.POST["name"]
+        category = Categories(name=name)
+        category.save()
+        return HttpResponseRedirect(reverse("categories"))
+    return render(request, "auctions/category_new.html")
+
+
 def category(request, category):
     listings = Listings.objects.filter(category=category)
     return render(request, "auctions/category.html", {
+        "category": Categories.objects.get(pk=category).name,
         "listings": listings
     })
 

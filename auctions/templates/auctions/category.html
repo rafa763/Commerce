@@ -1,7 +1,27 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Category listing</h2>
+    <h2>Category listing for {{ category }}</h2>
 
-    todooo
+    
+    {% for listing in listings %}
+        <a class='text-decoration-none' href="{% url 'listing' id=listing.id %}">
+            <div class="card flex-row mb-3">
+                <img class="card-img-left" src="{{ listing.image }}" alt="image">
+                <div class="card-body ml-4">
+                    <h1 class="card-title p-8">{{ listing.title }}</h1>
+                    <h5><strong>price:</strong> ${{ listing.price }}</h5>
+                    <h5 class="card-text mt-3 mb-3">{{ listing.description }}</h5>
+                    <p class="card-text">Created {{ listing.created_at }}</p>
+                </div>
+            </div>
+        </a>
+    <!-- empty -->
+    {% empty %}
+        <br>
+        <br>
+        <br>
+        <p>There are no listings in this category, try <a href="{% url 'create' %}">adding one</a>!</p>
+    {% endfor %}
+
 {% endblock %}
