@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -9,7 +10,7 @@ from .models import User, Listings, Bids, Comments, Categories, Watchlist
 
 def index(request):
     # all listings that are active
-    listings = Listings.objects.filter(active=True)
+    listings = Listings.objects.all()
     return render(request, "auctions/index.html", {
         "listings": listings
     })
@@ -61,30 +62,42 @@ def create(request):
     })
 
 
+@login_required(login_url="/login")
 def listing(request, id):
     if request.method == "POST":
-        # create bid
-        bid = float(request.POST["bid"])
-        listing = Listings.objects.get(pk=id)
-        current_price = Bids.objects.filter(listing=id).order_by("-bid").first()
-        bidder = User.objects.get(pk=request.user.id)
-        if current_price is not None:
-            if bid < current_price.bid:
-                return render(request, "auctions/listing.html", {
-                    "listing": listing,
-                    "current_price": current_price.bid,
-                    "message": "Bid must be greater than current price."
-                })
-        bid = Bids(bid=bid, listing=listing, created_by=bidder)
-        bid.save()
-        return HttpResponseRedirect(reverse("listing", args=(id,)))
+        form_type = request.POST["listing_form"]
+        if form_type == "comment":
+            pass
+        elif form_type == "watchlist":
+            pass
+        elif form_type == "end":
+            # end listing and change active to false
+            listing = Listings.objects.get(pk=id)
+            listing.active = False
+            listing.save()
+            return HttpResponseRedirect(reverse("listing", args=(id,)))
+        elif form_type == "bid":
+            bid = float(request.POST["bid"])
+            listing = Listings.objects.get(pk=id)
+            current_price = Bids.objects.filter(listing=id).order_by("-bid").first()
+            bidder = User.objects.get(pk=request.user.id)
+            if current_price is not None:
+                if bid < current_price.bid:
+                    return render(request, "auctions/listing.html", {
+                        "listing": listing,
+                        "current_price": current_price.bid,
+                        "message": "Bid must be greater than current price."
+                    })
+            bid = Bids(bid=bid, listing=listing, created_by=bidder)
+            bid.save()
+            return HttpResponseRedirect(reverse("listing", args=(id,)))
 
     current_price = Bids.objects.filter(listing=id).order_by("-bid").first()
-    print(f"{Listings.objects.get(pk=id).created_by} == {User.objects.get(pk=request.user.id)}")
     return render(request, "auctions/listing.html", {
         "listing": Listings.objects.get(pk=id),
         "current_price": current_price.bid if current_price is not None else Listings.objects.get(pk=id).price,
         "own_listing": Listings.objects.get(pk=id).created_by == User.objects.get(pk=request.user.id),
+        "winner": User.objects.get(pk=request.user.id) == current_price.created_by and Listings.objects.get(pk=id).active == False if current_price is not None else False
     })
 
 

@@ -48,7 +48,13 @@ class Comments(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="commenter")
     listing = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="listing_comment")
 
+    def __str__(self):
+        return f"{self.comment}: {self.created_at}, by: {self.created_by}, listing: {self.listing}"
+
 
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist_user")
     listing = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="watchlist_listing")
+
+    def __str__(self):
+        return f"{self.user}: {self.listing}"

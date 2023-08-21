@@ -18,19 +18,32 @@
         </div>
     {% endif %}
 
-    {% if own_listing %}
-        <button type="button" class="btn btn-danger">End Bidding!</button>
+
+    {% if listing.active %}
+        {% if own_listing %}
+            <form action="{% url 'listing' id=listing.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" name="listing_form" value="end" class="btn btn-danger">End Bidding!</button>
+            </form>
+        {% else %}
+            <form action="{% url 'listing' id=listing.id %}" method="post">
+                <div class="form-group">
+                    <label for="bid">Bid</label>
+                    <input class="form-control" type="number" name="bid">
+                </div>
+                {% csrf_token %}
+                <button class="btn btn-primary" name="listing_form" value="bid" type="submit">Place Bid</button>
+            </form> 
+        {% endif %}
     {% else %}
-        <form action="{% url 'listing' id=listing.id %}" method="post">
-            <div class="form-group">
-                <label for="bid">Bid</label>
-                <input class="form-control" type="number" name="bid">
+        <h5 class="mt-5"><strong>Listing has ended!</strong></h5>
+        {% if winner %}
+            <div class="alert alert-success" role="alert">
+                <p>Congratulations! you are the winner of this bid</p>
             </div>
-            {% csrf_token %}
-            <button class="btn btn-primary" type="submit">Place Bid</button>
-        </form> 
-    {% endif %}
-   
+        {% endif %}
+    {% endif %} 
+
     <h5 class="mt-5"><strong>Details</strong></h5>
     <ul class="mb-5">
         <li>Listed by: <a href="#">{{ listing.created_by }}</a></li>
@@ -44,7 +57,7 @@
             <textarea class="form-control" name="comment"></textarea>
         </div>
         {% csrf_token %}
-        <button class="btn btn-primary" type="submit">Post Comment</button>
+        <button class="btn btn-primary" name="listing_form" value="comment" type="submit">Post Comment</button>
     </form>
 
 {% endblock %}
