@@ -62,8 +62,29 @@ def create(request):
 
 
 def listing(request, id):
+    if request.method == "POST":
+        # create bid
+        bid = float(request.POST["bid"])
+        listing = Listings.objects.get(pk=id)
+        current_price = Bids.objects.filter(listing=id).order_by("-bid").first()
+        bidder = User.objects.get(pk=request.user.id)
+        if current_price is not None:
+            if bid < current_price.bid:
+                return render(request, "auctions/listing.html", {
+                    "listing": listing,
+                    "current_price": current_price.bid,
+                    "message": "Bid must be greater than current price."
+                })
+        bid = Bids(bid=bid, listing=listing, created_by=bidder)
+        bid.save()
+        return HttpResponseRedirect(reverse("listing", args=(id,)))
+
+    current_price = Bids.objects.filter(listing=id).order_by("-bid").first()
+    print(f"{Listings.objects.get(pk=id).created_by} == {User.objects.get(pk=request.user.id)}")
     return render(request, "auctions/listing.html", {
-        "listing": Listings.objects.get(pk=id)
+        "listing": Listings.objects.get(pk=id),
+        "current_price": current_price.bid if current_price is not None else Listings.objects.get(pk=id).price,
+        "own_listing": Listings.objects.get(pk=id).created_by == User.objects.get(pk=request.user.id),
     })
 
 

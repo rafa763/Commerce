@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -31,13 +32,13 @@ class Listings(models.Model):
 
 # bids
 class Bids(models.Model):
-    pass
-"""
     bid = models.DecimalField(max_digits=5, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bidder")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE,related_name="bidder")
     listing = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="listing_bid")
-    """
+
+    def __str__(self):
+        return f"{self.bid}: {self.created_at}, by: {self.created_by}, listing: {self.listing}"
 
 
 # comments

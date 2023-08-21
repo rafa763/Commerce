@@ -9,21 +9,42 @@
     </div>
     <div class="card-body ml-4">
         <h1 class="card-title p-8">{{ listing.title }}</h1>
-        <h5><strong>price:</strong> ${{ listing.price }}</h5>
+        <h5><strong>price:</strong> ${{ current_price }}</h5>
     </div>
 
-    <form action="{% url 'create' %}" method="post">
-        <div class="form-group">
-            <label for="bid">Bid</label>
-            <input class="form-control" type="number" name="bid">
+    {% if message %}
+        <div class="alert alert-warning" role="alert">
+            {{ message }}
         </div>
-        {% csrf_token %}
-        <button class="btn btn-primary" type="submit">Place Bid</button>
-    </form> 
+    {% endif %}
+
+    {% if own_listing %}
+        <button type="button" class="btn btn-danger">End Bidding!</button>
+    {% else %}
+        <form action="{% url 'listing' id=listing.id %}" method="post">
+            <div class="form-group">
+                <label for="bid">Bid</label>
+                <input class="form-control" type="number" name="bid">
+            </div>
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">Place Bid</button>
+        </form> 
+    {% endif %}
    
     <h5 class="mt-5"><strong>Details</strong></h5>
-    <ul>
-        <li>Listed by: <a href="#">name</a></li>
-        <li>Category: Electronics</li>
+    <ul class="mb-5">
+        <li>Listed by: <a href="#">{{ listing.created_by }}</a></li>
+        <li>Category: <a href="{% url 'category' listing.category.id %}">{{ listing.category.name }}</a></li>
     </ul>
+
+    <!-- Post a comment -->
+    <form action=""  method="post">
+        <div class="form-group">
+            <label for="comment">Create a comment!</label>
+            <textarea class="form-control" name="comment"></textarea>
+        </div>
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Post Comment</button>
+    </form>
+
 {% endblock %}
