@@ -43,18 +43,12 @@ class Bids(models.Model):
 
 # comments
 class Comments(models.Model):
-    pass
-"""
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="commenter")
     listing = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="listing_comment")
-    """
 
 
 class Watchlist(models.Model):
-    pass
-"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist_user")
     listing = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="watchlist_listing")
-"""
