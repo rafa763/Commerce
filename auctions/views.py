@@ -67,7 +67,12 @@ def listing(request, id):
     if request.method == "POST":
         form_type = request.POST["listing_form"]
         if form_type == "comment":
-            pass
+            comment = request.POST["comment"]
+            listing = Listings.objects.get(pk=id)
+            commenter = User.objects.get(pk=request.user.id)
+            comment = Comments(comment=comment, listing=listing, created_by=commenter)
+            comment.save()
+            return HttpResponseRedirect(reverse("listing", args=(id,)))
         elif form_type == "watchlist":
             pass
         elif form_type == "end":
@@ -97,7 +102,8 @@ def listing(request, id):
         "listing": Listings.objects.get(pk=id),
         "current_price": current_price.bid if current_price is not None else Listings.objects.get(pk=id).price,
         "own_listing": Listings.objects.get(pk=id).created_by == User.objects.get(pk=request.user.id),
-        "winner": User.objects.get(pk=request.user.id) == current_price.created_by and Listings.objects.get(pk=id).active == False if current_price is not None else False
+        "winner": User.objects.get(pk=request.user.id) == current_price.created_by and Listings.objects.get(pk=id).active == False if current_price is not None else False,
+        "comments": Comments.objects.filter(listing=id).order_by("-created_at")
     })
 
 
