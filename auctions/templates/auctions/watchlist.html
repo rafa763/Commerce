@@ -4,21 +4,23 @@
     <h2>Watchlist</h2>
 
     {% for item in watchlist %}
-        <div class="card flex-row mb-3">
-            <img class="card-img-left" src="{{ item.listing.image }}" alt="image">
-            <div class="card-body ml-4">
-                <h1 class="card-title p-8">{{ item.listing.title }}</h1>
-                <h5><strong>price:</strong> ${{ item.listing.price }}</h5>
-                <h5 class="card-text mt-3 mb-3">{{ item.listing.description }}</h5>
-                <p class="card-text">Created {{ item.listing.created_at }}</p>
-                <br>
-                <form action="" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="listing_id" value="{{ item.listing.id }}">
-                    <button type="submit" name="listing_form" value="end" class="btn btn-danger">Remove from watchlist</button>
-                </form>
+        <a class='text-decoration-none' href="{% url 'listing' id=item.listing.id %}">
+            <div class="card flex-row mb-3">
+                <img class="card-img-left" src="{{ item.listing.image }}" alt="image">
+                <div class="card-body ml-4">
+                    <h1 class="card-title p-8">{{ item.listing.title }}</h1>
+                    <h5><strong>price:</strong> ${{ item.listing.price }}</h5>
+                    <h5 class="card-text mt-3 mb-3">{{ item.listing.description }}</h5>
+                    <p class="card-text">Created {{ item.listing.created_at }}</p>
+                    <br>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="listing_id" value="{{ item.listing.id }}">
+                        <button type="submit" name="listing_form" value="end" class="btn btn-danger">Remove from watchlist</button>
+                    </form>
+                </div>
             </div>
-        </div>
+        </a>
     {% empty %}
         <p>Your watchlist is empty!</p>
     {% endfor %}

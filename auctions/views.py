@@ -10,7 +10,7 @@ from .models import User, Listings, Bids, Comments, Categories, Watchlist
 
 def index(request):
     # all listings that are active
-    listings = Listings.objects.all()
+    listings = Listings.objects.filter(active=True)
     return render(request, "auctions/index.html", {
         "listings": listings
     })
