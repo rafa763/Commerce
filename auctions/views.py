@@ -16,6 +16,7 @@ def index(request):
     })
 
 
+@login_required(login_url="/login")
 def categories(request):
     categs = Categories.objects.all()
     return render(request, "auctions/categories.html", {
@@ -23,6 +24,7 @@ def categories(request):
     })
 
 
+@login_required(login_url="/login")
 def category_new(request):
     if request.method == "POST":
         name = request.POST["name"]
@@ -32,6 +34,7 @@ def category_new(request):
     return render(request, "auctions/category_new.html")
 
 
+@login_required(login_url="/login")
 def category(request, category):
     listings = Listings.objects.filter(category=category)
     return render(request, "auctions/category.html", {
@@ -40,6 +43,7 @@ def category(request, category):
     })
 
 
+@login_required(login_url="/login")
 def create(request):
     if request.method == "POST":
         title = request.POST["title"]
@@ -64,26 +68,32 @@ def create(request):
 
 @login_required(login_url="/login")
 def listing(request, id):
+    user = User.objects.get(pk=request.user.id)
+    listing = Listings.objects.get(pk=id)
     if request.method == "POST":
         form_type = request.POST["listing_form"]
         if form_type == "comment":
             comment = request.POST["comment"]
-            listing = Listings.objects.get(pk=id)
             commenter = User.objects.get(pk=request.user.id)
             comment = Comments(comment=comment, listing=listing, created_by=commenter)
             comment.save()
             return HttpResponseRedirect(reverse("listing", args=(id,)))
         elif form_type == "watchlist":
-            pass
+            # insert into watchlist if not exists
+            watchlist = Watchlist.objects.filter(user=user, listing=listing)
+            if watchlist.exists():
+                pass
+            else:
+                watchlist = Watchlist(user=user, listing=listing)
+                watchlist.save()
+            return HttpResponseRedirect(reverse("listing", args=(id,)))
         elif form_type == "end":
             # end listing and change active to false
-            listing = Listings.objects.get(pk=id)
             listing.active = False
             listing.save()
             return HttpResponseRedirect(reverse("listing", args=(id,)))
         elif form_type == "bid":
             bid = float(request.POST["bid"])
-            listing = Listings.objects.get(pk=id)
             current_price = Bids.objects.filter(listing=id).order_by("-bid").first()
             bidder = User.objects.get(pk=request.user.id)
             if current_price is not None:
@@ -99,16 +109,27 @@ def listing(request, id):
 
     current_price = Bids.objects.filter(listing=id).order_by("-bid").first()
     return render(request, "auctions/listing.html", {
-        "listing": Listings.objects.get(pk=id),
-        "current_price": current_price.bid if current_price is not None else Listings.objects.get(pk=id).price,
-        "own_listing": Listings.objects.get(pk=id).created_by == User.objects.get(pk=request.user.id),
-        "winner": User.objects.get(pk=request.user.id) == current_price.created_by and Listings.objects.get(pk=id).active == False if current_price is not None else False,
+        "listing": listing,
+        "current_price": current_price.bid if current_price is not None else listing.price,
+        "own_listing": listing.created_by == user,
+        "winner": user == current_price.created_by and listing.active == False if current_price is not None else False,
         "comments": Comments.objects.filter(listing=id).order_by("-created_at")
     })
 
 
+@login_required(login_url="/login")
 def watchlist(request):
-    return render(request, "auctions/watchlist.html")
+    if request.method == "POST":
+        listing_id = request.POST["listing_id"]
+        listing = Listings.objects.get(pk=listing_id)
+        user = User.objects.get(pk=request.user.id)
+        watchlist = Watchlist.objects.filter(user=user, listing=listing)
+        watchlist.delete()
+        return HttpResponseRedirect(reverse("watchlist"))
+
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": Watchlist.objects.filter(user=request.user.id),
+    })
 
 
 def login_view(request):

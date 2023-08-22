@@ -2,7 +2,12 @@
 
 {% block body %}
     <h2>Listing: {{ listing.title }}</h2>
-    <button type="button" class="btn mt-2 btn-secondary">Add to watchlist</button>
+
+
+    <form action="{% url 'listing' id=listing.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" name="listing_form" value="watchlist" class="btn mt-2 btn-secondary">Add to watchlist</button>
+    </form>
 
     
     <div class="col-md-3 px0">
@@ -54,7 +59,7 @@
     <!-- Post a comment -->
     <form action=""  method="post">
         <div class="form-group">
-            <label for="comment">Create a comment!</label>
+            <h5 class="mt-5"><strong>Create a comment!</strong></h5>
             <textarea class="form-control" name="comment"></textarea>
         </div>
         {% csrf_token %}
@@ -70,6 +75,8 @@
                 <p class="card-text"><small class="text-muted">Posted by <a href="#">{{ comment.created_by }}</a> on {{ comment.created_at }}</small></p>
             </div>
         </div>
+    {% empty %}
+        <p>No comments yet!</p>
     {% endfor %}
 
 {% endblock %}
