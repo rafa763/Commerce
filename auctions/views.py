@@ -118,6 +118,17 @@ def listing(request, id):
 
 
 @login_required(login_url="/login")
+def bid(request, id):
+    # display all the bids for a listing
+    listing = Listings.objects.get(pk=id)
+    bids = Bids.objects.filter(listing=id).order_by("-bid")
+    return render(request, "auctions/history.html", {
+        "listing": listing,
+        "bids": bids
+    })
+
+
+@login_required(login_url="/login")
 def watchlist(request):
     if request.method == "POST":
         listing_id = request.POST["listing_id"]

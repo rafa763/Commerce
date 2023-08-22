@@ -1,0 +1,24 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Bidding History</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Bidder</th>
+                <th scope="col">Amount</th>
+                <th scope="col">At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bid in bids %}
+                <tr>
+                    <td>{{ bid.created_by }}</td>
+                    <td>{{ bid.bid }}</td>
+                    <td>{{ bid.created_at }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+{% endblock %}
